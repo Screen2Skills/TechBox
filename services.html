@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TechBox Services</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f9fc;
+    color:#111;
+}
+
+.navbar{
+    background:#fff;
+    padding:15px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 15px rgba(0,0,0,.08);
+}
+
+.logo img{
+    height:55px;
+}
+
+.nav-links{
+    display:flex;
+    gap:12px;
+}
+
+.nav-links button{
+    border:none;
+    background:#19afe9;
+    color:white;
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.hero{
+    background:
+    linear-gradient(
+        rgba(0,0,0,.55),
+        rgba(0,0,0,.55)
+    ),
+    url("b1.png");
+
+    background-size:cover;
+    background-position:center;
+
+    color:white;
+    text-align:center;
+    padding:80px 20px;
+}
+
+.hero h1{
+    font-size:48px;
+    margin-bottom:15px;
+}
+
+.hero p{
+    max-width:700px;
+    margin:auto;
+    line-height:1.6;
+}
+
+.container{
+    max-width:1300px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.services-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+}
+
+.service-card{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.service-image{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+    background:#e8eef3;
+}
+
+.service-body{
+    padding:20px;
+}
+
+.service-title{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+.service-description{
+    color:#666;
+    line-height:1.5;
+    margin-bottom:15px;
+}
+
+.price{
+    color:#19afe9;
+    font-size:26px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.billing{
+    color:#888;
+    margin-bottom:15px;
+}
+
+textarea{
+    width:100%;
+    min-height:100px;
+    resize:vertical;
+    padding:12px;
+    border:1px solid #d9e7ef;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.order-btn{
+    width:100%;
+    border:none;
+    background:#19afe9;
+    color:white;
+    padding:14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:15px;
+}
+
+.order-btn:hover{
+    background:#0e9ad4;
+}
+
+.empty{
+    text-align:center;
+    background:white;
+    padding:40px;
+    border-radius:18px;
+}
+
+.footer{
+    margin-top:50px;
+    background:#0b1220;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+@media(max-width:768px){
+
+    .navbar{
+        padding:15px;
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .hero h1{
+        font-size:34px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        <img src="logo.png" alt="TechBox">
+    </div>
+
+    <div class="nav-links">
+
+        <button onclick="window.location.href='dashboard.html'">
+            Dashboard
+        </button>
+
+        <button onclick="window.location.href='orders.html'">
+            My Orders
+        </button>
+
+    </div>
+
+</nav>
+
+<section class="hero">
+
+    <h1>Our Services</h1>
+
+    <p>
+        Turn your ideas into reality with TechBox.
+        Choose a service, tell us your requirements,
+        and our team will start working on your project.
+    </p>
+
+</section>
+
+<div class="container">
+
+    <div
+        class="services-grid"
+        id="servicesGrid"
+    >
+        Loading services...
+    </div>
+
+</div>
+
+<footer class="footer">
+    © 2026 TechBox • Build • Launch • Grow
+</footer>
+
+<script>
+
+const API =
+"https://techbox-backend-usi4.onrender.com";
+
+const token =
+localStorage.getItem("token");
+
+if(!token){
+
+    window.location.href =
+    "login.html";
+
+}
+
+async function loadServices(){
+
+    try{
+
+        const response =
+        await fetch(
+            API + "/api/services"
+        );
+
+        const data =
+        await response.json();
+
+        const grid =
+        document.getElementById(
+            "servicesGrid"
+        );
+
+        if(
+            !data.services ||
+            data.services.length === 0
+        ){
+
+            grid.innerHTML =
+            `
+            <div class="empty">
+                No services available yet.
+            </div>
+            `;
+
+            return;
+        }
+
+        grid.innerHTML = "";
+
+        data.services.forEach(service => {
+
+            const image =
+            service.image &&
+            service.image.trim() !== ""
+            ? service.image
+            : "b1.png";
+
+            grid.innerHTML +=
+            `
+            <div class="service-card">
+
+                <img
+                    src="${image}"
+                    class="service-image"
+                >
+
+                <div class="service-body">
+
+                    <h2 class="service-title">
+                        ${service.title}
+                    </h2>
+
+                    <p class="service-description">
+                        ${service.description}
+                    </p>
+
+                    <div class="price">
+                        ₹${service.price}
+                    </div>
+
+                    <div class="billing">
+                        ${service.billing_type}
+                    </div>
+
+                    <textarea
+                        id="req-${service.id}"
+                        placeholder="Describe your requirements..."
+                    ></textarea>
+
+                    <button
+                        class="order-btn"
+                        onclick="placeOrder('${service.id}')"
+                    >
+                        Order Now
+                    </button>
+
+                </div>
+
+            </div>
+            `;
+
+        });
+
+    }
+    catch(error){
+
+        document.getElementById(
+            "servicesGrid"
+        ).innerHTML =
+        `
+        <div class="empty">
+            Failed to load services.
+        </div>
+        `;
+
+    }
+
+}
+
+async function placeOrder(serviceId){
+
+    const requirements =
+    document
+    .getElementById(
+        "req-" + serviceId
+    )
+    .value
+    .trim();
+
+    if(!requirements){
+
+        alert(
+            "Please enter your requirements."
+        );
+
+        return;
+    }
+
+    try{
+
+        const response =
+        await fetch(
+            API + "/api/orders",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json",
+
+                    Authorization:
+                    "Bearer " + token
+                },
+
+                body:JSON.stringify({
+                    product_id: serviceId,
+                    requirements
+                })
+            }
+        );
+
+        const data =
+        await response.json();
+
+        if(data.success){
+
+            alert(
+                "Order placed successfully."
+            );
+
+            window.location.href =
+            "orders.html";
+
+        }
+        else{
+
+            alert(
+                data.message ||
+                "Failed to place order."
+            );
+
+        }
+
+    }
+    catch(error){
+
+        alert(
+            "Network error."
+        );
+
+    }
+
+}
+
+loadServices();
+
+</script>
+
+</body>
+</html>

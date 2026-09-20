@@ -327,12 +327,24 @@ body{
         </p>
 
         <div class="hero-buttons">
-
+            <button
+                class="primary-btn"
+                id="adminBtn"
+                onclick="window.location.href='admin.html'"
+                style="display:none;"
+                >
+                Admin Panel
+            </button>
             <button
                 class="primary-btn"
                 onclick="comingSoon()"
             >
                 Create Project
+            <button
+                class="secondary-btn"
+                onclick="window.location.href='orders.html'"
+            >
+                My Orders
             </button>
 
             <button
@@ -438,22 +450,22 @@ body{
     <div class="tools">
 
         <div class="tool">
-            <h3>🌐 Website Builder</h3>
+            <h3>Website Builder</h3>
             <p>Coming Soon</p>
         </div>
 
         <div class="tool">
-            <h3>🤖 AI Builder</h3>
+            <h3>AI Builder</h3>
             <p>Coming Soon</p>
         </div>
 
         <div class="tool">
-            <h3>🎨 Logo Generator</h3>
+            <h3>Logo Generator</h3>
             <p>Coming Soon</p>
         </div>
 
         <div class="tool">
-            <h3>📈 Marketing Tools</h3>
+            <h3>Marketing Tools</h3>
             <p>Coming Soon</p>
         </div>
 
@@ -497,7 +509,24 @@ if(!token){
     window.location.href =
     "login.html";
 }
+function logout(){
 
+    localStorage.removeItem(
+        "token"
+    );
+
+    window.location.href =
+    "login.html";
+}
+
+function comingSoon(){
+
+    alert(
+        "Feature coming soon"
+    );
+}
+
+loadUser();
 async function loadUser(){
 
     try{
@@ -515,18 +544,28 @@ async function loadUser(){
 
         const data =
         await response.json();
+		console.log(data);
 
         if(data.user){
 
             document
             .getElementById("userName")
             .innerText =
-            data.user.name;
+            data.user.name || "User";
 
             document
             .getElementById("userEmail")
             .innerText =
-            data.user.email;
+            data.user.email || "";
+
+            if(data.user.role === "admin"){
+
+                document
+                .getElementById("adminBtn")
+                .style.display =
+                "inline-block";
+
+            }
         }
 
     }
@@ -535,23 +574,6 @@ async function loadUser(){
         console.log(error);
 
     }
-}
-
-function logout(){
-
-    localStorage.removeItem(
-        "token"
-    );
-
-    window.location.href =
-    "login.html";
-}
-
-function comingSoon(){
-
-    alert(
-        "Feature coming soon"
-    );
 }
 
 loadUser();

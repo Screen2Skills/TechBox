@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders - TechBox</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f9fc;
+}
+
+.navbar{
+    background:#fff;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 15px rgba(0,0,0,.08);
+}
+
+.logo img{
+    height:55px;
+}
+
+.nav-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.btn{
+    border:none;
+    background:#19afe9;
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#0f9bd1;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.page-title{
+    margin-bottom:25px;
+}
+
+.orders-grid{
+    display:grid;
+    gap:20px;
+}
+
+.order-card{
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.order-id{
+    font-size:13px;
+    color:#666;
+    margin-bottom:10px;
+}
+
+.order-title{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.order-status{
+    display:inline-block;
+    padding:8px 14px;
+    border-radius:30px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.pending{
+    background:#fff3cd;
+    color:#856404;
+}
+
+.approved{
+    background:#d4edda;
+    color:#155724;
+}
+
+.completed{
+    background:#d1ecf1;
+    color:#0c5460;
+}
+
+.rejected{
+    background:#f8d7da;
+    color:#721c24;
+}
+
+.order-info{
+    color:#555;
+    margin-bottom:8px;
+}
+
+.empty{
+    background:white;
+    padding:40px;
+    text-align:center;
+    border-radius:16px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        <img src="logo.png" alt="TechBox">
+    </div>
+
+    <div class="nav-buttons">
+
+        <button
+            class="btn"
+            onclick="window.location.href='dashboard.html'"
+        >
+            Dashboard
+        </button>
+
+        <button
+            class="btn"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</nav>
+
+<div class="container">
+
+    <h1 class="page-title">
+        My Orders
+    </h1>
+
+    <div id="ordersContainer">
+
+        <div class="empty">
+            Loading orders...
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const API =
+"https://techbox-backend-usi4.onrender.com";
+
+const token =
+localStorage.getItem("token");
+
+if(!token){
+    window.location.href =
+    "login.html";
+}
+
+async function loadOrders(){
+
+    try{
+
+        const response =
+        await fetch(
+            API + "/api/orders/my",
+            {
+                headers:{
+                    Authorization:
+                    "Bearer " + token
+                }
+            }
+        );
+
+        const data =
+        await response.json();
+
+        const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+        if(
+            !data.orders ||
+            data.orders.length === 0
+        ){
+
+            container.innerHTML = `
+                <div class="empty">
+                    No orders found.
+                </div>
+            `;
+
+            return;
+        }
+
+        let html = `
+            <div class="orders-grid">
+        `;
+
+        data.orders.forEach(order => {
+
+            const status =
+            (order.status || "Pending")
+            .toLowerCase();
+
+            html += `
+            <div class="order-card">
+
+                <div class="order-id">
+                    Order ID:
+                    ${order.id}
+                </div>
+
+                <div class="order-title">
+                    Service Order
+                </div>
+
+                <div class="order-status ${status}">
+                    ${order.status || "Pending"}
+                </div>
+
+                <div class="order-info">
+                    Product ID:
+                    ${order.product_id || "-"}
+                </div>
+
+                <div class="order-info">
+                    Requirements:
+                    ${order.requirements || "-"}
+                </div>
+
+                <div class="order-info">
+                    Created:
+                    ${new Date(
+                        order.created_at
+                    ).toLocaleString()}
+                </div>
+
+            </div>
+            `;
+
+        });
+
+        html += "</div>";
+
+        container.innerHTML = html;
+
+    }
+    catch(error){
+
+        document
+        .getElementById(
+            "ordersContainer"
+        )
+        .innerHTML = `
+            <div class="empty">
+                Failed to load orders.
+            </div>
+        `;
+
+        console.error(error);
+
+    }
+}
+
+function logout(){
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    window.location.href =
+    "login.html";
+}
+
+loadOrders();
+
+</script>
+
+</body>
+</html>
