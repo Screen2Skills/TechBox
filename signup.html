@@ -212,7 +212,7 @@ button:disabled{
 </div>
 
 <script>
-
+let cooldown = false;
 const API =
 "https://techbox-backend-usi4.onrender.com/api/auth";
 
@@ -243,10 +243,16 @@ function showMessage(text, success = false){
 // ======================
 // SEND OTP
 // ======================
-
 sendOtpBtn.addEventListener(
 "click",
 async () => {
+
+    if(cooldown){
+        showMessage(
+            "Please wait before requesting another OTP"
+        );
+        return;
+    }
 
     const email =
     document
@@ -254,12 +260,13 @@ async () => {
     .value
     .trim();
 
-    if(!email){
+    const emailRegex =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    if(!emailRegex.test(email)){
         showMessage(
-            "Please enter your email"
+            "Enter a valid email"
         );
-
         return;
     }
 
@@ -292,6 +299,37 @@ async () => {
             data.success
         );
 
+        if(data.success){
+
+            cooldown = true;
+
+            let seconds = 60;
+
+            const timer =
+            setInterval(() => {
+
+                sendOtpBtn.textContent =
+                `Wait ${seconds}s`;
+
+                seconds--;
+
+                if(seconds < 0){
+
+                    clearInterval(timer);
+
+                    cooldown = false;
+
+                    sendOtpBtn.disabled = false;
+
+                    sendOtpBtn.textContent =
+                    "Send OTP";
+                }
+
+            },1000);
+
+            return;
+        }
+
     }
     catch(error){
 
@@ -300,13 +338,10 @@ async () => {
         );
 
     }
-    finally{
 
-        sendOtpBtn.disabled = false;
-        sendOtpBtn.textContent =
-        "Send OTP";
-
-    }
+    sendOtpBtn.disabled = false;
+    sendOtpBtn.textContent =
+    "Send OTP";
 
 });
 
@@ -314,7 +349,6 @@ async () => {
 // ======================
 // SIGNUP
 // ======================
-
 signupBtn.addEventListener(
 "click",
 async () => {
@@ -354,9 +388,66 @@ async () => {
         return;
     }
 
+    if(name.length < 2){
+        showMessage(
+            "Enter a valid name"
+        );
+        return;
+    }
+
+    if(
+        !/^[a-zA-Z\s]+$/.test(name)
+    ){
+        showMessage(
+            "Name can only contain letters"
+        );
+        return;
+    }
+
+    const emailRegex =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!emailRegex.test(email)){
+        showMessage(
+            "Enter a valid email"
+        );
+        return;
+    }
+
+    if(password.length < 8){
+        showMessage(
+            "Password must be at least 8 characters"
+        );
+        return;
+    }
+
+    if(!/[A-Z]/.test(password)){
+        showMessage(
+            "Password needs an uppercase letter"
+        );
+        return;
+    }
+
+    if(!/[0-9]/.test(password)){
+        showMessage(
+            "Password needs a number"
+        );
+        return;
+    }
+
+    if(
+        !/^\d{6}$/.test(otp)
+    ){
+        showMessage(
+            "Enter a valid 6 digit OTP"
+        );
+        return;
+    }
+
     try{
 
         signupBtn.disabled = true;
+
         signupBtn.textContent =
         "Creating Account...";
 
@@ -398,7 +489,7 @@ async () => {
                 window.location.href =
                 "dashboard.html";
 
-            }, 1200);
+            },1200);
 
         }
 
@@ -413,6 +504,7 @@ async () => {
     finally{
 
         signupBtn.disabled = false;
+
         signupBtn.textContent =
         "Create Account";
 
