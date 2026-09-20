@@ -24,7 +24,26 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+.start-box{
+    margin-top:30px;
+}
 
+.start-btn{
+    display:inline-block;
+    background:#19afe9;
+    color:#fff;
+    text-decoration:none;
+    padding:16px 34px;
+    border-radius:14px;
+    font-size:18px;
+    font-weight:700;
+    transition:.3s;
+}
+
+.start-btn:hover{
+    transform:translateY(-2px);
+    background:#1498ca;
+}
 
 /* =========================
    NAVBAR
